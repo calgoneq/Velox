@@ -86,6 +86,6 @@ if __name__ == "__main__":
         except KeyError as e:
             print(f"Błąd: Nie znaleziono klucza w odpowiedzi API. Treść odpowiedzi: {e}")
     
-        prices = get_latest_prices(conn=conn)
-        analyze_price(prices=prices, api_key=groq_api_key)
-        conn.close()
+    prices = get_latest_prices(conn=conn)
+    analyze_price(prices=prices, api_key=groq_api_key)
+    conn.close()
