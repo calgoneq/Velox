@@ -1,9 +1,10 @@
 venv/
 *.db
-.env
+.env*
 .DS_Store
 .vscode/
 .git
+__pycache__/
 .gitignore
 *.md
 Dockerfile
