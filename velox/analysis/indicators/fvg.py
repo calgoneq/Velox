@@ -1,7 +1,7 @@
 def detect_fvg(prices: list[float], percent: float) -> list[str]:
     fvg = []
 
-    for i in range(1, len(prices)):
+    for i in range(2, len(prices)):
         margin = prices[i] * percent
 
         if prices[i] > prices[i-2] + margin:
@@ -13,9 +13,9 @@ def detect_fvg(prices: list[float], percent: float) -> list[str]:
         else:
             fvg.append("None")
 
-        return fvg
+    return fvg
 
-def calculate_sentiment(fvg: list[str]) -> int:
+def calculate_sentiment_fvg(fvg: list[str]) -> int:
     sentiment_score = 0
 
     for i in fvg:
