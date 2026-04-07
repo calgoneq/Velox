@@ -3,3 +3,4 @@ CRYPTO_ID = "bitcoin"
 API_URL = "https://api.coingecko.com/api/v3/simple/price"
 AMOUNT_TO_FETCH = 5
 RETRIES = 5
+PERCENT = 0.01           # 1% ceny

@@ -9,8 +9,9 @@ import os
 from velox.fetcher.coingecko import get_price
 from velox.database.repository import PriceRepository
 from velox.analysis.analyzer import analyze_price
-from velox.config import CRYPTO_ID, DB_NAME, AMOUNT_TO_FETCH, RETRIES, API_URL
+from velox.config import CRYPTO_ID, DB_NAME, AMOUNT_TO_FETCH, RETRIES, API_URL, PERCENT
 from velox.analysis.indicators.rsi import calculate_rsi
+from velox.analysis.indicators.fvg import detect_fvg, calculate_sentiment
 
 load_dotenv()
 groq_api_key = os.environ.get("GROQ_API_KEY")
@@ -45,4 +46,6 @@ if __name__ == "__main__":
 
     prices = repo.get_last_n_prices(n=AMOUNT_TO_FETCH)
     rsi = calculate_rsi(prices=prices)
-    analyze_price(prices=prices, api_key=groq_api_key, rsi=rsi)
+    fvg = detect_fvg(prices=prices, percent=PERCENT)
+    sentiment_score = calculate_sentiment(fvg=fvg)
+    analyze_price(prices=prices, api_key=groq_api_key, rsi=rsi, sentiment_score=sentiment_score)
