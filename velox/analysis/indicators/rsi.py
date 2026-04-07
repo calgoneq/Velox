@@ -1,4 +1,8 @@
 def calculate_rsi(prices: list[float]) -> float:
+
+    if len(prices) < 2:
+        raise ValueError("At least 2 prices are required to calculate RSI")
+
     gains = []
     losses = []
 

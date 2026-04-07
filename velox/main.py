@@ -1,6 +1,5 @@
 from datetime import datetime
-import requests
-import time
+import httpx
 from dotenv import load_dotenv
 import sys
 import os
@@ -41,20 +40,22 @@ async def main():
             logger.info(f"Record {price_counter} added successfully")
 
             if price_counter < RETRIES:
-                time.sleep(10)
+                await asyncio.sleep(10)
 
-        except requests.exceptions.RequestException as e:
+        except httpx.HTTPError as e:
             logger.error(f"Network/API error on attempt {price_counter + 1}: {e}")
-            time.sleep(60)
+            await asyncio.sleep(60)
         except KeyError as e:
             logger.error(f"Key not found in API response. Response content: {e}")
 
     prices = repo.get_last_n_prices(n=AMOUNT_TO_FETCH)
+
     rsi = calculate_rsi(prices=prices)
     fvg = detect_fvg(prices=prices, percent=PERCENT)
     fvg_sentiment_score = calculate_sentiment_fvg(fvg=fvg)
     msa = detect_swings(prices=prices)
     msa_sentiment_score = calculate_sentiment_msa(msa=msa)
+
     analyze_price(logger=logger, prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
 
 if __name__ == "__main__":
