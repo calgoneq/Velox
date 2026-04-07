@@ -10,4 +10,4 @@ COPY . .
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "fetch_price.py"]
+CMD ["python", "-m", "velox.main"]

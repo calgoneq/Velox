@@ -14,7 +14,7 @@ class PriceRepository:
 
     def get_last_n_prices(self, n: int) -> list[float]:
         with sqlite3.connect(self.db_name) as conn:
-            cursor = conn.cursor()  # Tu tworzymy "długopis" do bazy
+            cursor = conn.cursor()
             cursor.execute("SELECT price FROM prices ORDER BY id DESC LIMIT ?", (n,))
-            data = cursor.fetchall() # Tu wyciągamy dane "długopisem"
+            data = cursor.fetchall()
             return [row[0] for row in data]

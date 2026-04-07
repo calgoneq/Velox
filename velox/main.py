@@ -9,7 +9,7 @@ import asyncio
 from velox.fetcher.coingecko import get_price
 from velox.database.repository import PriceRepository
 from velox.analysis.analyzer import analyze_price
-from velox.config import CRYPTO_ID, DB_NAME, AMOUNT_TO_FETCH, RETRIES, API_URL, PERCENT
+from velox.config import CRYPTO_ID, DB_NAME, AMOUNT_TO_FETCH, SAMPLES_TO_COLLECT, API_URL, PERCENT
 from velox.analysis.indicators.rsi import calculate_rsi
 from velox.analysis.indicators.fvg import detect_fvg, calculate_sentiment_fvg
 from velox.analysis.indicators.msa import detect_swings, calculate_sentiment_msa
@@ -29,7 +29,7 @@ async def main():
     repo.init_db()
     price_counter = 0
 
-    while price_counter < RETRIES:       
+    while price_counter < SAMPLES_TO_COLLECT:       
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         try:
@@ -39,7 +39,7 @@ async def main():
             price_counter += 1
             logger.info(f"Record {price_counter} added successfully")
 
-            if price_counter < RETRIES:
+            if price_counter < SAMPLES_TO_COLLECT:
                 await asyncio.sleep(10)
 
         except httpx.HTTPError as e:
@@ -56,7 +56,8 @@ async def main():
     msa = detect_swings(prices=prices)
     msa_sentiment_score = calculate_sentiment_msa(msa=msa)
 
-    analyze_price(logger=logger, prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
+    result = analyze_price(prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
+    logger.info(result)
 
 if __name__ == "__main__":
     asyncio.run(main())

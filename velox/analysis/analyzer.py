@@ -1,6 +1,6 @@
 from groq import Groq
 
-def analyze_price(logger, prices: list[float], api_key: str, rsi: float, fvg: int, msa: int) -> str:
+def analyze_price(prices: list[float], api_key: str, rsi: float, fvg: int, msa: int) -> str:
     client = Groq(api_key=api_key)
 
     chat_completion = client.chat.completions.create(
@@ -18,4 +18,7 @@ def analyze_price(logger, prices: list[float], api_key: str, rsi: float, fvg: in
         ],
         model="openai/gpt-oss-20b",
     )
-    logger.info(chat_completion.choices[0].message.content)
+    
+    response = chat_completion.choices[0].message.content
+
+    return response
