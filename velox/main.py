@@ -1,10 +1,11 @@
 from datetime import datetime
-import sqlite3
 import requests
 import time
 from dotenv import load_dotenv
 import sys
 import os
+import logging
+import asyncio
 
 from velox.fetcher.coingecko import get_price
 from velox.database.repository import PriceRepository
@@ -14,13 +15,16 @@ from velox.analysis.indicators.rsi import calculate_rsi
 from velox.analysis.indicators.fvg import detect_fvg, calculate_sentiment_fvg
 from velox.analysis.indicators.msa import detect_swings, calculate_sentiment_msa
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 groq_api_key = os.environ.get("GROQ_API_KEY")
 repo = PriceRepository(DB_NAME)
 
-if __name__ == "__main__":
+async def main():
     if not groq_api_key:
-        print("ERROR: GROQ_API_KEY environment variable is not set.")
+        logger.error("ERROR: GROQ_API_KEY environment variable is not set.")
         sys.exit(1)
 
     repo.init_db()
@@ -30,20 +34,20 @@ if __name__ == "__main__":
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         try:
-            price = get_price(crypto_id=CRYPTO_ID, api_url=API_URL)
+            price = await get_price(crypto_id=CRYPTO_ID, api_url=API_URL)
             repo.save(crypto_id=CRYPTO_ID, price=price, timestamp=timestamp)
 
             price_counter += 1
-            print(f"Record {price_counter} added")
+            logger.info(f"Record {price_counter} added successfully")
 
             if price_counter < RETRIES:
                 time.sleep(10)
 
         except requests.exceptions.RequestException as e:
-            print(f"Network/API error on attempt {price_counter + 1}: {e}")
+            logger.error(f"Network/API error on attempt {price_counter + 1}: {e}")
             time.sleep(60)
         except KeyError as e:
-            print(f"Error: Key not found in API response. Response content: {e}")
+            logger.error(f"Key not found in API response. Response content: {e}")
 
     prices = repo.get_last_n_prices(n=AMOUNT_TO_FETCH)
     rsi = calculate_rsi(prices=prices)
@@ -51,4 +55,7 @@ if __name__ == "__main__":
     fvg_sentiment_score = calculate_sentiment_fvg(fvg=fvg)
     msa = detect_swings(prices=prices)
     msa_sentiment_score = calculate_sentiment_msa(msa=msa)
-    analyze_price(prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
+    analyze_price(logger=logger, prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
+
+if __name__ == "__main__":
+    asyncio.run(main())
