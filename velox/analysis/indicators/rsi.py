@@ -1,21 +1,34 @@
-def calculate_rsi(prices: list[float]) -> float:
+def calculate_rsi(prices: list[float], period: int) -> float:
 
     if len(prices) < 2:
         raise ValueError("At least 2 prices are required to calculate RSI")
+    if len(prices) < period + 1:
+        raise IndexError("Period can't be higher then price list")
 
     gains = []
     losses = []
 
-    for i in range(1, len(prices)):
+    for i in range(1, period):
         change = prices[i] - prices[i-1]
         
         if change > 0:
             gains.append(change)
         elif change < 0:
             losses.append(abs(change))
+    
+    avg_gain = sum(gains) / period if gains else 0
+    avg_loss = sum(losses) / period if losses else 0
 
-    avg_gain = sum(gains) / len(gains) if gains else 0
-    avg_loss = sum(losses) / len(losses) if losses else 0
+    for i in range(period + 1, len(prices)):
+        change = prices[i] - prices[i-1]
+        current_loss = 0
+        current_gain = 0
+
+        current_gain = change if change > 0 else 0
+        current_loss = abs(change) if change < 0 else 0
+
+        avg_gain = (avg_gain * (period - 1) + current_gain) / period
+        avg_loss = (avg_loss * (period - 1) + current_loss) / period
 
     if avg_loss == 0:
         return 100.0
@@ -25,3 +38,6 @@ def calculate_rsi(prices: list[float]) -> float:
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
+
+if __name__ == "__main__":
+    calculate_rsi(prices= [10, 20, 3, 23, 34, 57, 48, 75, 90], period=14)
