@@ -1,6 +1,7 @@
 DB_NAME = "crypto.db"
-CRYPTO_ID = "bitcoin"
-API_URL = "https://api.coingecko.com/api/v3/simple/price"
-AMOUNT_TO_FETCH = 20
-SAMPLES_TO_COLLECT = 5
+CRYPTO_ID = "BTCUSDT"
+API_URL = "https://api.binance.com/api/v3/klines"
+AMOUNT_TO_FETCH = 15
+SAMPLES_TO_COLLECT = 20
 PERCENT = 0.01           # 1% ceny
+PERIOD = 14

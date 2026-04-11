@@ -6,15 +6,16 @@ class PriceRepository:
 
     def init_db(self):
         with sqlite3.connect(self.db_name) as conn:
-            conn.execute('CREATE TABLE IF NOT EXISTS prices (id INTEGER PRIMARY KEY, crypto_id TEXT, price REAL, timestamp TEXT)')
+            conn.execute('CREATE TABLE IF NOT EXISTS prices (id INTEGER PRIMARY KEY, crypto_id TEXT, open_price REAL, high REAL, low REAL, close REAL, timestamp TEXT)')
 
-    def save(self, crypto_id: str, price: float, timestamp: str):
+    def save(self, crypto_id: str, open_price: float, high: float, low: float, close: float, timestamp: str):
         with sqlite3.connect(self.db_name) as conn:
-            conn.execute("INSERT INTO prices (crypto_id, price, timestamp) VALUES (?, ?, ?)", (crypto_id, price, timestamp))
+            conn.execute("INSERT INTO prices (crypto_id, open_price, high, low, close, timestamp) VALUES (?, ?, ?, ?, ?, ?)", (crypto_id, open_price, high, low, close, timestamp))
 
     def get_last_n_prices(self, n: int) -> list[float]:
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT price FROM prices ORDER BY id DESC LIMIT ?", (n,))
+            cursor.execute("SELECT open_price, high, low, close FROM prices ORDER BY id DESC LIMIT ?", (n,))
             data = cursor.fetchall()
-            return [row[0] for row in data]
+            
+            return [row for row in data]

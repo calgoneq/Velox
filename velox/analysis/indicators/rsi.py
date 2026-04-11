@@ -8,8 +8,10 @@ def calculate_rsi(prices: list[float], period: int) -> float:
     gains = []
     losses = []
 
+    closes = [candle[3] for candle in prices]
+
     for i in range(1, period):
-        change = prices[i] - prices[i-1]
+        change = closes[i] - closes[i-1]
         
         if change > 0:
             gains.append(change)
@@ -19,8 +21,8 @@ def calculate_rsi(prices: list[float], period: int) -> float:
     avg_gain = sum(gains) / period if gains else 0
     avg_loss = sum(losses) / period if losses else 0
 
-    for i in range(period + 1, len(prices)):
-        change = prices[i] - prices[i-1]
+    for i in range(period, len(prices)):
+        change = closes[i] - closes[i - 1]
         current_loss = 0
         current_gain = 0
 
@@ -38,6 +40,3 @@ def calculate_rsi(prices: list[float], period: int) -> float:
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
-
-if __name__ == "__main__":
-    calculate_rsi(prices= [10, 20, 3, 23, 34, 57, 48, 75, 90], period=14)

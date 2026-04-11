@@ -1,13 +1,17 @@
-def detect_fvg(prices: list[float], percent: float) -> list[str]:
+def detect_fvg(prices: list, percent: float) -> list[str]:
     fvg = []
 
-    for i in range(2, len(prices)):
-        margin = prices[i] * percent
+    closes = [candle[3] for candle in prices]
+    lows = [candle[2] for candle in prices]
+    highs = [candle[1] for candle in prices]
 
-        if prices[i] > prices[i-2] + margin:
+    for i in range(2, len(prices)):
+        margin = closes[i] * percent
+
+        if lows[i] > highs[i-2] + margin:
             fvg.append("Bullish Gap")
 
-        elif prices[i] < prices[i-2] - margin:
+        elif highs[i] < lows[i-2] - margin:
             fvg.append("Bearish Gap")
         
         else:

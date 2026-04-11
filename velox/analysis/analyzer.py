@@ -3,12 +3,14 @@ from groq import Groq
 def analyze_price(prices: list[float], api_key: str, rsi: float, fvg: int, msa: int) -> str:
     client = Groq(api_key=api_key)
 
+    closes = [candle[3] for candle in prices]
+
     chat_completion = client.chat.completions.create(
         messages=[
             {
                 "role": "user",
                 "content": f'''
-                    I have these 5 Bitcoin prices from the last 2 minutes: {prices}.
+                    I have these 5 Bitcoin prices from the last 2 minutes: {closes}.
                     RSI for those prices gives: {rsi}.
                     FVG for those prices gives: {fvg}.
                     MSA for those prices gives: {msa}.
