@@ -1,8 +1,4 @@
-def detect_swings(prices: list[tuple]) -> dict:
-
-    highs = [candle[1] for candle in prices[:-1]]
-    lows = [candle[2] for candle in prices[:-1]]
-
+def detect_swings(highs: list[float], lows: list[float], closes: list[float]) -> dict:
     max_high = max(highs)
     min_low = min(lows)
 
@@ -10,8 +6,7 @@ def detect_swings(prices: list[tuple]) -> dict:
 
     return swings
 
-def calculate_sentiment_msa(msa: dict, prices: list[tuple]) -> int:
-    closes = [candle[3] for candle in prices]
+def calculate_sentiment_msa(msa: dict, closes: list[float]) -> int:
     last_close = closes[-1]
 
     if last_close > msa['high']:

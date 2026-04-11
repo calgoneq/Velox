@@ -1,7 +1,7 @@
 from velox.config import API_URL, CRYPTO_ID
 import httpx
 
-async def get_price(crypto_id: str, api_url: str) -> list:
+async def get_price(crypto_id: str, api_url: str) -> list[float]:
     url = f'{api_url}?symbol={crypto_id}&interval=1m&limit=1'
     
     async with httpx.AsyncClient() as client:
@@ -14,6 +14,6 @@ async def get_price(crypto_id: str, api_url: str) -> list:
         low = data[0][3]
         close = data[0][4]
 
-        candle_data = [open_price, high, low, close]
+        candle_data = [float(open_price), float(high), float(low), float(close)]
 
         return candle_data

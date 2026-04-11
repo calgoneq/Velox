@@ -1,14 +1,12 @@
-def calculate_rsi(prices: list[float], period: int) -> float:
+def calculate_rsi(closes: list[float], period: int) -> float:
 
-    if len(prices) < 2:
+    if len(closes) < 2:
         raise ValueError("At least 2 prices are required to calculate RSI")
-    if len(prices) < period + 1:
+    if len(closes) < period + 1:
         raise IndexError("Period can't be higher then price list")
 
     gains = []
     losses = []
-
-    closes = [candle[3] for candle in prices]
 
     for i in range(1, period):
         change = closes[i] - closes[i-1]
@@ -21,7 +19,7 @@ def calculate_rsi(prices: list[float], period: int) -> float:
     avg_gain = sum(gains) / period if gains else 0
     avg_loss = sum(losses) / period if losses else 0
 
-    for i in range(period, len(prices)):
+    for i in range(period, len(closes)):
         change = closes[i] - closes[i - 1]
         current_loss = 0
         current_gain = 0

@@ -1,9 +1,7 @@
 from groq import Groq
 
-def analyze_price(prices: list[float], api_key: str, rsi: float, fvg: int, msa: int) -> str:
+def analyze_price(closes: list[float], api_key: str, rsi: float, fvg: int, msa: int) -> str:
     client = Groq(api_key=api_key)
-
-    closes = [candle[3] for candle in prices]
 
     chat_completion = client.chat.completions.create(
         messages=[
@@ -14,7 +12,7 @@ def analyze_price(prices: list[float], api_key: str, rsi: float, fvg: int, msa: 
                     RSI for those prices gives: {rsi}.
                     FVG for those prices gives: {fvg}.
                     MSA for those prices gives: {msa}.
-                    Act as a crypto analyst. Is the trend going up or down? Answer in 1 sentence.
+                    Give me a technical summary based on the data provided. Is the trend going up or down? Answer in 1 sentence.
                 ''',
             }
         ],

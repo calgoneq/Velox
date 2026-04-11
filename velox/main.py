@@ -13,6 +13,7 @@ from velox.config import CRYPTO_ID, DB_NAME, AMOUNT_TO_FETCH, SAMPLES_TO_COLLECT
 from velox.analysis.indicators.rsi import calculate_rsi
 from velox.analysis.indicators.fvg import detect_fvg, calculate_sentiment_fvg
 from velox.analysis.indicators.msa import detect_swings, calculate_sentiment_msa
+from velox.analysis.utils import unpack_prices
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -34,7 +35,8 @@ async def main():
         
         try:
             price = await get_price(crypto_id=CRYPTO_ID, api_url=API_URL)
-            
+            print(price)
+
             repo.save(crypto_id=CRYPTO_ID, open_price=price[0], high=price[1], low=price[2], close=price[3], timestamp=timestamp)
 
             price_counter += 1
@@ -50,14 +52,15 @@ async def main():
             logger.error(f"Key not found in API response. Response content: {e}")
 
     prices = repo.get_last_n_prices(n=AMOUNT_TO_FETCH)
+    open_prices, highs, lows, closes = unpack_prices(prices)
 
-    rsi = calculate_rsi(prices=prices, period=PERIOD)
-    fvg = detect_fvg(prices=prices, percent=PERCENT)
+    rsi = calculate_rsi(closes=closes, period=PERIOD)
+    fvg = detect_fvg(highs=highs, lows=lows, closes=closes, percent=PERCENT)
     fvg_sentiment_score = calculate_sentiment_fvg(fvg=fvg)
-    msa = detect_swings(prices=prices)
-    msa_sentiment_score = calculate_sentiment_msa(msa=msa, prices=prices)
+    msa = detect_swings(highs=highs, lows=lows, closes=closes)
+    msa_sentiment_score = calculate_sentiment_msa(msa=msa, closes=closes)
 
-    result = analyze_price(prices=prices, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
+    result = analyze_price(closes=closes, api_key=groq_api_key, rsi=rsi, fvg=fvg_sentiment_score, msa=msa_sentiment_score)
     logger.info(result)
 
 if __name__ == "__main__":

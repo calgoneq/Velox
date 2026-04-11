@@ -1,11 +1,7 @@
-def detect_fvg(prices: list, percent: float) -> list[str]:
+def detect_fvg(highs: list[float], lows: list[float], closes: list[float], percent: float) -> list[str]:
     fvg = []
 
-    closes = [candle[3] for candle in prices]
-    lows = [candle[2] for candle in prices]
-    highs = [candle[1] for candle in prices]
-
-    for i in range(2, len(prices)):
+    for i in range(2, len(closes)):
         margin = closes[i] * percent
 
         if lows[i] > highs[i-2] + margin:
